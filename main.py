@@ -94,7 +94,8 @@ X_train = mnist['X_train']
 
 # Retrieve all data arrays
 X_train, y_train, X_test, y_test = [mnist[f] for
-                                    f in mnist.files]
+                                    f in ['X_train', 'y_train',
+                                    'X_test', 'y_test']]
 
 
 # Implementing Multilayer Perceptron
@@ -274,11 +275,10 @@ class NeuralNetMLP(object):
             if self.shuffle:
                 self.random.shuffle(indices)
 
-            for start_idx in range(0, indices.shape[0] -
-                                      self.minibatch_size +
+            for start_idx in range(0, indices.shape[0] - self.minibatch_size +
                                       1, self.minibatch_size):
                 batch_idx = indices[start_idx:start_idx +
-                            self.minibatch_size]
+                                              self.minibatch_size]
 
                 # Forward propagation
                 z_h, a_h, z_out, a_out = self._forward(X_train[batch_idx])
@@ -326,18 +326,14 @@ class NeuralNetMLP(object):
             y_train_pred = self.predict(X_train)
             y_valid_pred = self.predict(X_valid)
 
-            train_acc = ((np.sum(y_train ==
-                                 y_valid_pred)).astype(np.float) /
+            train_acc = ((np.sum(y_train == y_train_pred)).astype(np.float) /
                          X_train.shape[0])
-            valid_acc = ((np.sum(y_valid ==
-                                 y_valid_pred)).astype(np.float) /
+            valid_acc = ((np.sum(y_valid == y_valid_pred)).astype(np.float) /
                          X_valid.shape[0])
 
             sys.stderr.write('\r%0*d/%d | Cost: %.2f '
-                             '| Train/Valid Acc.: %.2f%%/%.2f%% '
-                             %
-                             (epoch_strlen, i+1, self.epochs,
-                              cost,
+                             '| Train/Valid Acc.: %.2f%%/%.2f%% ' %
+                             (epoch_strlen, i+1, self.epochs, cost,
                               train_acc*100, valid_acc*100))
             sys.stderr.flush()
 
@@ -350,7 +346,7 @@ class NeuralNetMLP(object):
 # Initialize new 784-100-10 MLP (784 input units, 100 hidden units, 10 output units)
 nn = NeuralNetMLP(n_hidden=100,
                   l2=0.01,
-                  epochs=100,
+                  epochs=200,
                   eta=0.0005,
                   minibatch_size=100,
                   shuffle=True,
